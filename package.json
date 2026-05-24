@@ -1,0 +1,29 @@
+{
+  "name": "observability-page",
+  "version": "1.0.0",
+  "description": "Contentful Page-location app: live CDA observability dashboard for the Meta demo.",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "upload": "npm run build && sh -c 'set -a; . ../../.env; set +a; contentful-app-scripts upload --bundle-dir build --token \"$CONTENTFUL_MANAGEMENT_TOKEN\" --organization-id \"$CONTENTFUL_ORGANIZATION_ID\" --comment \"demo\"'",
+    "open": "contentful-app-scripts open"
+  },
+  "dependencies": {
+    "@contentful/app-sdk": "^4.29.1",
+    "@contentful/f36-components": "^4.74.0",
+    "@contentful/f36-tokens": "^4.0.2",
+    "@contentful/react-apps-toolkit": "^1.2.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@contentful/app-scripts": "^3.0.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.6"
+  }
+}
