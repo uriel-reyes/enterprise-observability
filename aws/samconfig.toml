@@ -1,0 +1,9 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "contentful-audit-api"
+resolve_s3 = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "S3BucketName=\"contentful-audit-log-demo\" S3BucketRegion=\"us-east-2\" AllowedOrigin=\"https://app.contentful.com\""
+confirm_changeset = false
+fail_on_empty_changeset = false

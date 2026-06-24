@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Contentful Audit Log API — Lambda proxy in front of an existing private S3 bucket
+
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: Name of your existing S3 bucket (Contentful audit export destination)
+  S3BucketRegion:
+    Type: String
+    Default: us-east-1
+    Description: AWS region where the S3 bucket lives (must match bucket location)
+  AllowedOrigin:
+    Type: String
+    Default: https://app.contentful.com
+    Description: CORS origin for the Contentful web app
+
+Resources:
+  AuditLogFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../lambda/
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      Handler: handler.handler
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          S3_BUCKET_NAME: !Ref S3BucketName
+          S3_BUCKET_REGION: !Ref S3BucketRegion
+          ALLOWED_ORIGIN: !Ref AllowedOrigin
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref S3BucketName
+      Events:
+        ListLogs:
+          Type: HttpApi
+          Properties:
+            Path: /logs
+            Method: GET
+            ApiId: !Ref AuditLogApi
+        GetEntries:
+          Type: HttpApi
+          Properties:
+            Path: /logs/entries
+            Method: GET
+            ApiId: !Ref AuditLogApi
+
+  AuditLogApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowedOrigin
+        AllowMethods:
+          - GET
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+
+Outputs:
+  ApiUrl:
+    Description: Set this as VITE_AUDIT_API_URL in the Contentful app .env
+    Value: !Sub 'https://${AuditLogApi}.execute-api.${AWS::Region}.amazonaws.com'
